@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Hourglass Demo</h1>
+    <p id="clock"> </p>
+</body>
+    <script>        
+        var screen = document.getElementById('clock');
+        //var size = prompt("시계의 크기를 입력해 주세요. (min = 1)");
+        var depth = 5;
+
+        var drawLine = function(space, star) {
+            var ret = "";
+            for (var i = 0; i < space; i++) {
+                ret += "&nbsp;";
+            }
+            for (var i = 0; i < star; i++) {
+                ret += "*";
+            }
+            ret += "<br>\n";
+            return ret;
+        };
+        var hourglass = function(size) {
+            var ret = "";
+            //위쪽 시계
+            for (var i = 0;  i< size; i++) {
+                width = (size - i) * 2 - 1;
+                space = i
+                ret += drawLine(space, width);
+                
+            }
+            //아래쪽 시계
+            for (var i = 0;  i< size; i++) {
+                width = (i + 1) * 2 - 1;
+                space = size - i - 1;
+                ret += drawLine(space, width);
+            }
+            return ret;
+        }
+
+        screen.innerHTML = hourglass(depth);
+
+    </script>
+</html>
