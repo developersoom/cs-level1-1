@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+    <style>
+        p {
+            font-family: "Courier New", Courier, monospace;
+            font-size: 2em;	
+        }
+    </style>
 </head>
 <body>
     <h1>Hourglass Demo</h1>
@@ -23,7 +29,7 @@
             for (var i = 0; i < n; i++) {
                 this.arr.push([]);
                 for (var j = 0; j < n; j++) {
-                    this.arr[i][j] = "_";
+                    this.arr[i][j] = "&nbsp;";
                 }
             }
 
@@ -34,13 +40,44 @@
             this.step = 0;
         };
 
+        //draw first line
         hourglass.start = function() {
             this.i = this.step;
-            this.arr[this.i][this.j] = "*";
+            this.arr[this.i][this.j] = "+";
             
             this.step++;
             if (this.step == this.size) {
                 this.stage = "middle";
+                this.step = 0;
+                this.width = Math.floor(this.size/2);
+            }
+        }
+
+        //draw triangle
+        hourglass.middle = function() {  
+            if (this.width === 0) {
+                this.stage = "last";
+                this.step = 0;
+                this.height = Math.floor(this.size / 2);
+                return;
+            }         
+            this.step++;            
+            this.arr[this.i][this.j - this.step] = "+";  
+            this.arr[this.i][this.j + this.step] = "+";
+
+            if (this.step  === this.width) {
+                this.i--;
+                this.width--;
+                this.step = 0;
+            }
+        }
+
+        hourglass.last = function() {
+            this.i = this.step;
+            this.arr[this.i][this.j] = " ";
+            this.step++;
+            if(this.step == this.height) {
+                this.stage = "end";
             }
         }
 
@@ -53,13 +90,22 @@
         };      
         
         hourglass.next = function() {            
-            if (this.stage === "start") {
-                hourglass.start();
-            } else {
-                console.log("The end");
-                clearInterval(this.tid);
-            }            
-        }
+            switch(this.stage) {
+                case "start":
+                    hourglass.start();
+                break;
+
+                case "middle":
+                    hourglass.middle();
+                break;
+                case "last":
+                    hourglass.last();
+                break;
+                default:
+                    console.log("The end");
+                    clearInterval(this.tid)
+            }
+        };
         
         var go = function() {
             hourglass.next();
@@ -67,7 +113,7 @@
         }
 
         hourglass.init(10);
-        hourglass.tid = setInterval(go, 250);
+        hourglass.tid = setInterval(go, 120);
 
     </script>
 </html>
