@@ -12,52 +12,62 @@
 </body>
     <script>        
         var screen = document.getElementById('clock');
-        //var size = prompt("시계의 크기를 입력해 주세요. (min = 1)");
-        var depth = 7;
-        var count = 0;
 
-        var drawLine = function(space, width, time, mark1, mark2) {
-            var ret = "";
-            for (var i = 0; i < space; i++) {
-                ret += "&nbsp;";
-            }
+        var hourglass = {time: 0};
+        hourglass.init = function(size) {
+            this.size = size * 2 + 1;
+            this.arr = [];
+            var n = this.size;
 
-            for (var i = 0; i < width; i++) {                      
-                if (count >= time) {
-                    ret += mark2;
-                } else {
-                    ret += mark1;
+            //init array
+            for (var i = 0; i < n; i++) {
+                this.arr.push([]);
+                for (var j = 0; j < n; j++) {
+                    this.arr[i][j] = "_";
                 }
-                count++;                                      
             }
-            ret += "<br>\n";  
-            return ret;
+
+            //init start point
+            this.i = 0;
+            this.j = size;
+            this.stage = "start";
+            this.step = 0;
         };
 
-        var hourglass = function(size, time) {
-            count = 0;
-            var ret = "";           
-
-            //위쪽 시계
-            for (var i = 0;  i< size; i++) {                
-                width = (size - i) * 2 - 1;
-                space = i;
-                ret += drawLine(space, width, time,"&nbsp;", "*");
+        hourglass.start = function() {
+            this.i = this.step;
+            this.arr[this.i][this.j] = "*";
+            
+            this.step++;
+            if (this.step == this.size) {
+                this.stage = "middle";
             }
+        }
 
-            ret += "<br>\n";
-             
-            return ret;
-        }        
-
-        var now = 0;
-        var drawSand = function() {            
-            var ret = hourglass(depth, now);
-            now++;
+        hourglass.draw = function() {
+            var ret = "";
+            for (var i = 0; i < this.size; i++) {
+                ret += this.arr[i].join("") + "<br>\n";
+            }
             screen.innerHTML = ret;
-        };
+        };      
+        
+        hourglass.next = function() {            
+            if (this.stage === "start") {
+                hourglass.start();
+            } else {
+                console.log("The end");
+                clearInterval(this.tid);
+            }            
+        }
+        
+        var go = function() {
+            hourglass.next();
+            hourglass.draw();
+        }
 
-        var pid = setInterval(drawSand, 250);
+        hourglass.init(10);
+        hourglass.tid = setInterval(go, 250);
 
     </script>
 </html>
