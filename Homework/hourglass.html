@@ -13,38 +13,51 @@
     <script>        
         var screen = document.getElementById('clock');
         //var size = prompt("시계의 크기를 입력해 주세요. (min = 1)");
-        var depth = 5;
+        var depth = 7;
+        var count = 0;
 
-        var drawLine = function(space, star) {
+        var drawLine = function(space, width, time, mark1, mark2) {
             var ret = "";
             for (var i = 0; i < space; i++) {
                 ret += "&nbsp;";
             }
-            for (var i = 0; i < star; i++) {
-                ret += "*";
+
+            for (var i = 0; i < width; i++) {                      
+                if (count >= time) {
+                    ret += mark2;
+                } else {
+                    ret += mark1;
+                }
+                count++;                                      
             }
-            ret += "<br>\n";
+            ret += "<br>\n";  
             return ret;
         };
-        var hourglass = function(size) {
-            var ret = "";
-            //위쪽 시계
-            for (var i = 0;  i< size; i++) {
-                width = (size - i) * 2 - 1;
-                space = i
-                ret += drawLine(space, width);
-                
-            }
-            //아래쪽 시계
-            for (var i = 0;  i< size; i++) {
-                width = (i + 1) * 2 - 1;
-                space = size - i - 1;
-                ret += drawLine(space, width);
-            }
-            return ret;
-        }
 
-        screen.innerHTML = hourglass(depth);
+        var hourglass = function(size, time) {
+            count = 0;
+            var ret = "";           
+
+            //위쪽 시계
+            for (var i = 0;  i< size; i++) {                
+                width = (size - i) * 2 - 1;
+                space = i;
+                ret += drawLine(space, width, time,"&nbsp;", "*");
+            }
+
+            ret += "<br>\n";
+             
+            return ret;
+        }        
+
+        var now = 0;
+        var drawSand = function() {            
+            var ret = hourglass(depth, now);
+            now++;
+            screen.innerHTML = ret;
+        };
+
+        var pid = setInterval(drawSand, 250);
 
     </script>
 </html>
