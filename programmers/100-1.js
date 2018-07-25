@@ -6,9 +6,8 @@ function solution(s) {
     var middle = Math.floor(s.length / 2);
     
     if (s.length % 2 == 0) {
-        answer = s[middle - 1] + s[middle]
-    } else {
-        answer = s[middle];
-    }
+        answer = s[middle - 1]
+    } 
+    answer += s[middle];
     return answer;
 }
