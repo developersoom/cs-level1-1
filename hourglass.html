@@ -8,84 +8,145 @@
     <style>
         p {
             font-family: "Courier New", Courier, monospace;
-            font-size: 1em;	
+            font-size: 14px;	
         }
     </style>
 </head>
 <body>
-    <h1>모래시계</h1>
-    <p id="screen"></p>
-    <button id="stop" onclick="stop()">멈추기</button>
-    <script>
-        screen = document.getElementById('screen');
-        var updateTime = function() {
-            screen.innerHTML = new Date();
-        };
-
-        //1. 5 * 10 초기화 
-
-        var glass = [];
-        var count = 0;
-
-        var init = function() {
-
-            count = 0;
-
-            //배열 초기화
-            for (var i = 0; i < 10; i++) {
-                glass.push([]);
-                for (var j = 0; j < 5; j++) {
-                   glass[i][j] = '&nbsp;';
+    <h1>hg Demo</h1>
+    <p id="clock"> </p>
+</body>
+    <script>        
+        var hg = {time: 0, w:21, h:23, arr: []};
+        var screen = document.getElementById('clock');
+        
+        hg.initArray = function() {
+            this.arr=[];
+            for (var i = 0; i <this.h; i++) {
+                this.arr.push([]);
+                for (var j = 0; j < this.w; j++) {
+                    //this.arr[i][j] = "&nbsp;";
+                    this.arr[i][j] = ".";
                 }
             }
-
-            //테두리 만들기 
-            for (var j = 0; j < 5; j++) {
-                   glass[0][j] = '-';
-            }
-            for (var j = 0; j < 5; j++) {
-                   glass[9][j] = '-';
-            }   
-        };
-        init();
-
-        //2. 모래시계 그리기
-        var display = function() {
-            var str = "";
-            for (var i = 0; i < 10; i++) {
-                str += glass[i].join("") + "<br>";
-            }
-            screen.innerHTML = str;
         };
 
-
-        //떨어뜨리기 구현
-        var drop = function() {
-            console.log("drop", count);
-            count++;
-
-            if (count > 9) {
-                return;
+        hg.drawLine = function(height, start, len, mark) {
+            for (var i = start; i < len; i++) {
+                this.arr[height][i] = mark;
             }
-
-            var middle = 2;
-            if (count > 1) {
-                glass[count - 1][middle] = '&nbsp;';
-            }
-            glass[count][middle] = 'O';
         };
 
-        var play = function() {
-            drop();
-            display();
+        hg.drawWall = function(height, left, right, m1, m2) {
+            this.arr[height][left] = m1;
+            this.arr[height][right] = m2;
+        };
+        
+
+        hg.drawGlass = function() {
+            //draw ===
+            this.drawLine(0, 0, this.w, '=' );
+            this.drawLine(this.h - 1, 0, this.w, '=' );
+
+            //draw \/
+            var th = (this.h - 3) / 2;            
+            for (var i = 1; i <= th; i++) {
+                console.log(i);
+                this.drawWall(i, i - 1, this.w - i, '\\', '/');
+            }
+            
+            i--;
+            this.drawWall(i + 1, i - 1, this.w - i, '|', '|');
+            
+            //draw /\
+            for (var i = 1; i <= th; i++) {
+                this.drawWall(i + th + 1, th - i , th + i, '/', '\\');                
+            }
+            
+
+        };
+        
+        hg.init = function() {
+            hg.initArray();
+            hg.drawGlass();
+        };
+
+        //draw first line
+        hg.start = function() {
+            this.i = this.step;
+            this.arr[this.i][this.j] = "+";
+            
+            this.step++;
+            if (this.step == this.size) {
+                this.stage = "middle";
+                this.step = 0;
+                this.width = Math.floor(this.size/2);
+            }
         }
 
-        var pid = setInterval(play, 300);
+        //draw triangle
+        hg.middle = function() {  
+            if (this.width === 0) {
+                this.stage = "last";
+                this.step = 0;
+                this.height = Math.floor(this.size / 2);
+                return;
+            }         
+            this.step++;            
+            this.arr[this.i][this.j - this.step] = "+";  
+            this.arr[this.i][this.j + this.step] = "+";
 
-        var stop = function() {
-            clearInterval(pid);
-            screen.innerHTML  = "끝";
+            if (this.step  === this.width) {
+                this.i--;
+                this.width--;
+                this.step = 0;
+            }
+        }
+
+        hg.last = function() {
+            this.i = this.step;
+            this.arr[this.i][this.j] = " ";
+            this.step++;
+            if(this.step == this.height) {
+                this.stage = "end";
+            }
+        }
+
+        hg.draw = function() {
+            var ret = "";
+            for (var i = 0; i < this.h; i++) {
+                ret += this.arr[i].join("") + "<br>\n";
+            }
+            screen.innerHTML = ret;
+        };      
+        
+        hg.next = function() {            
+            switch(this.stage) {
+                case "start":
+                    hg.start();
+                break;
+
+                case "middle":
+                    hg.middle();
+                break;
+                case "last":
+                    hg.last();
+                break;
+                default:
+                    console.log("The end");
+                    clearInterval(this.tid)
+            }
         };
+        
+        var go = function() {
+            hg.next();
+            hg.draw();
+        }
+
+    hg.init();
+    hg.draw();
+        
+        //hg.tid = setInterval(go, 120);
+
     </script>
-</body>
 </html>
